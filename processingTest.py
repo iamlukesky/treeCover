@@ -49,7 +49,7 @@ for file in filefilt:
     outfile = "COV_" + file[4:]
     arglist.append([procdir+file, coords, outdir+outfile, outfile])
     
-print arglist
+#print arglist
 
 formula1 =('ifelse(a > 50, 1, 0)')
 formula2 = ('a * 4')
@@ -59,9 +59,12 @@ formula2 = ('a * 4')
 for arg in arglist:
     tmp1 = tmpdir + "t1_" + arg[3]
     tmp2 = tmpdir + "t2_" + arg[3]
-    Processing.runalg("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
-    Processing.runalg("grass:r.mfilter", tmp1, filter,1,False,arg[1],0, tmp2)
-    Processing.runalg("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
+    print "saga"
+    Processing.runAlgorithm("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
+    print "grass"
+    Processing.runAlgorithm("grass:r.mfilter", tmp1, filter,1,False,arg[1],0, tmp2)
+    print "rascal"
+    Processing.runAlgorithm("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
     
 
 #QgsApplication.exitQgis();
