@@ -15,9 +15,9 @@ from processing.core.Processing import Processing
 from processing.tools import *
 
 Processing.initialize()
-print Processing.getAlgorithm("qgis:creategrid")
 
-
+print "startar"
+print "filer"
 # Processing directory
 cwd = os.getcwd()
 procdir = cwd + '/LST-trad/hojd/'
@@ -34,8 +34,7 @@ filefilt =[]
 for f in files:
     if f.endswith(".tif"):
         filefilt.append(f)
-        
-print "hej"
+
 # List with files
 
 # Coordinates
@@ -48,8 +47,8 @@ for file in filefilt:
     coords =  str(x1) + "," + str(x2) + "," + str( y1) + "," + str(y2)
     outfile = "COV_" + file[4:]
     arglist.append([procdir+file, coords, outdir+outfile, outfile])
-    
-#print arglist
+
+print arglist
 
 formula1 =('ifelse(a > 50, 1, 0)')
 formula2 = ('a * 4')
@@ -60,12 +59,12 @@ for arg in arglist:
     tmp1 = tmpdir + "t1_" + arg[3]
     tmp2 = tmpdir + "t2_" + arg[3]
     print "saga"
-    Processing.runAlgorithm("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
+    general.runalg("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
     print "grass"
-    Processing.runAlgorithm("grass:r.mfilter", tmp1, filter,1,False,arg[1],0, tmp2)
+    general.runalg("grass:r.mfilter", tmp1, filter,1,False,arg[1],0, tmp2)
     print "rascal"
-    Processing.runAlgorithm("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
-    
+    general.runalg("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
+
 
 #QgsApplication.exitQgis();
 
