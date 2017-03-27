@@ -12,12 +12,10 @@ QgsApplication.setPrefixPath('/usr', True)
 
 sys.path.append('/usr/share/qgis/python/plugins')
 from processing.core.Processing import Processing
-from processing.tools import *
+import processing.tools.general as processing
 
 Processing.initialize()
 
-print "startar"
-print "filer"
 # Processing directory
 cwd = os.getcwd()
 procdir = cwd + '/LST-trad/hojd/'
@@ -26,7 +24,7 @@ outdir = cwd + '/LST-trad/treecover2/'
 #procdir = "D:/Projekt/2017/LST-trad/hojd/"
 #tmpdir = "D:/Projekt/2017/LST-trad/Test2/"
 #outdir = "D:/Projekt/2017/LST-trad/treecover2/"
-filter = "qgis5x5filter_1or0_div1.txt"
+filter = cwd + "/LST-trad/qgis5x5filter_1or0_div1.txt"
 files = os.listdir(procdir)
 #files = [f for f in os.listdir(procdir) if os.path.isfile(f)]
 # Filter files
@@ -34,8 +32,13 @@ filefilt =[]
 for f in files:
     if f.endswith(".tif"):
         filefilt.append(f)
-
+        
+print "hej"
 # List with files
+
+print "help:"
+#processing.alghelp("saga:rastercalculator")
+processing.alghelp("grass:r.mfilter")
 
 # Coordinates
 arglist = []
@@ -47,24 +50,21 @@ for file in filefilt:
     coords =  str(x1) + "," + str(x2) + "," + str( y1) + "," + str(y2)
     outfile = "COV_" + file[4:]
     arglist.append([procdir+file, coords, outdir+outfile, outfile])
-
-print arglist
+    
+#print arglist
 
 formula1 =('ifelse(a > 50, 1, 0)')
 formula2 = ('a * 4')
-
-
 
 for arg in arglist:
     tmp1 = tmpdir + "t1_" + arg[3]
     tmp2 = tmpdir + "t2_" + arg[3]
     print "saga"
-    general.runalg("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
+    processing.runalg("saga:rastercalculator", arg[0], None, formula1, True, 1, tmp1)
     print "grass"
-    general.runalg("grass:r.mfilter", tmp1, filter,1,False,arg[1],0, tmp2)
+    processing.runalg("grass:r.mfilter", tmp1, filter,1,False,arg[1], 0, tmp2)
     print "rascal"
-    general.runalg("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
-
-
-#QgsApplication.exitQgis();
+    processing.runalg("saga:rastercalculator", tmp2, None, formula2, True, 1, arg[2])
+    
+QgsApplication.exitQgis();
 
