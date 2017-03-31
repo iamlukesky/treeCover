@@ -43,7 +43,7 @@ outputraster = outdir + "/uttest.tif"
 
 fileInfo = QFileInfo(inputraster)
 baseName = fileInfo.baseName()
-rlayer = QgsRasterLayer(inputraster, baseName)
+rlayer = getObject(inputraster)
 
 extent = rlayer.extent()
 xmin = extent.xMinimum()
@@ -62,4 +62,4 @@ outputs_SAGARASTERCALCULATOR_2=runalg('saga:rastercalculator', outputs_GRASS7R_M
 
 print "done"
 
-QgsApplication.exitQgis();
+#QgsApplication.exitQgis();
