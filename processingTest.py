@@ -4,6 +4,8 @@ import os
 import sys
 from PyQt4.QtGui import *
 from PyQt4.QtCore import Qt
+
+sys.path.append('/usr/share/qgis/python/plugins')
 from processing.core.Processing import Processing
 #import processing.tools.general as processing
 from processing.tools.dataobjects import *
@@ -12,7 +14,6 @@ from processing.tools.vector import *
 from processing.tools.raster import *
 from processing.tools.system import *
 
-sys.path.append('/usr/share/qgis/python/plugins')
 app = QgsApplication(sys.argv, True)
 QgsApplication.initQgis();
 QgsApplication.setPrefixPath('/usr', True)
