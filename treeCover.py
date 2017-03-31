@@ -1,3 +1,4 @@
+print "importing"
 from qgis.core import *
 from qgis.gui import *
 import os
@@ -14,24 +15,24 @@ from processing.tools.vector import *
 from processing.tools.raster import *
 from processing.tools.system import *
 
+print "initializing"
 app = QgsApplication(sys.argv, True)
 QgsApplication.setPrefixPath('/usr', True)
 QgsApplication.initQgis();
 
 Processing.initialize()
 
-# Processing directory
-cwd = os.getcwd()
-procdir = cwd + '/LST-trad/hojd/'
-outdir = cwd + '/LST-trad/treecover2/'
-filterfile = cwd + "/LST-trad/qgis5x5filter_1or0_div1.txt"
-files = os.listdir(procdir)
-#files = [f for f in os.listdir(procdir) if os.path.isfile(f)]
-# Filter files
-#filefilt =[]
-#for f in files:
-    #if f.endswith(".tif"):
-        #filefilt.append(f)
+def getExtent(extentRaster):
+    fileInfo = QFileInfo(inputraster)
+    baseName = fileInfo.baseName()
+    rlayer = getObject(inputraster)
+
+    extent = rlayer.extent()
+    xmin = extent.xMinimum()
+    xmax = extent.xMaximum()
+    ymin = extent.yMinimum()
+    ymax = extent.yMaximum()
+    return "%f,%f,%f,%f"% (xmin, xmax, ymin, ymax)
 
 print "startar"
 
@@ -39,28 +40,46 @@ print "startar"
 #alghelp("saga:rastercalculator")
 #alghelp("grass:r.mfilter")
 
-inputraster = procdir + "/THL_66_6_0025.tif"
-outputraster = outdir + "/uttest.tif"
+# Processing directory
+cwd = os.getcwd()
+procdir = cwd + '/LST-trad/hojd/'
+outdir = cwd + '/LST-trad/treecover2/'
+filterfile = cwd + "/LST-trad/qgis5x5filter_1or0_div1.txt"
 
-fileInfo = QFileInfo(inputraster)
-baseName = fileInfo.baseName()
-rlayer = getObject(inputraster)
+inputfiles = []
+for file in os.listdir(procdir):
+    if file.endswith(".tif"):
+        inputfiles.append(os.path.join(procdir, file))
 
-extent = rlayer.extent()
-xmin = extent.xMinimum()
-xmax = extent.xMaximum()
-ymin = extent.yMinimum()
-ymax = extent.yMaximum()
+saga_expression_1 = 'ifelse(a > 50, 1, 0)'
+saga_expression_2 = 'a * 4'
 
-print "rascal 1"
-outputs_SAGARASTERCALCULATOR_1=runalg('saga:rastercalculator', inputraster,[],'ifelse(a > 50, 1, 0)',True,1,None)
+for file in inputfiles:
+    basename = QFileInfo(file).baseName()
+    print "starting: ", basename
+    inputraster = file
+    outputraster = "COV_" + basename + ".tif"
+    outputraster = outdir + outputraster
+    # extent is used for Grass commands since they are picky
+    # with how the extent is defined. Other commands can usually use None as
+    # extent to use the entire file.
+    extent = getExtent(inputraster)
 
-print "mfilter"
-outputs_GRASS7R_MFILTER_1=runalg('grass7:r.mfilter', outputs_SAGARASTERCALCULATOR_1['RESULT'],filterfile,1.0,False,"%f,%f,%f,%f"% (xmin, xmax, ymin, ymax),0.0,None)
+    print "rascal 1"
+    outputs_SAGARASTERCALCULATOR_1=runalg('saga:rastercalculator',
+                                          inputraster,[],saga_expression_1,True,1,None)
 
-print "rascal 2"
-outputs_SAGARASTERCALCULATOR_2=runalg('saga:rastercalculator', outputs_GRASS7R_MFILTER_1['output'],[],'a * 4',True,1,outputraster)
+    print "mfilter"
+    outputs_GRASS7R_MFILTER_1=runalg('grass7:r.mfilter',
+                                 outputs_SAGARASTERCALCULATOR_1['RESULT'],filterfile,1.0,False,extent,0.0,None)
 
-print "done"
+    print "rascal 2"
+    outputs_SAGARASTERCALCULATOR_2=runalg('saga:rastercalculator',
+                                          outputs_GRASS7R_MFILTER_1['output'],[],saga_expression_2,True,1,outputraster)
 
+    print "done with: ", basename
+    print "output: ", outputraster
+
+print "done, no more inputfiles"
 #QgsApplication.exitQgis();
+
