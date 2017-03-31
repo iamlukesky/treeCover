@@ -15,8 +15,9 @@ from processing.tools.raster import *
 from processing.tools.system import *
 
 app = QgsApplication(sys.argv, True)
-QgsApplication.initQgis();
 QgsApplication.setPrefixPath('/usr', True)
+QgsApplication.initQgis();
+
 Processing.initialize()
 
 # Processing directory
