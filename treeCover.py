@@ -9,8 +9,11 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import Qt, QFileInfo
 
 #Needed to make python aware of where Processing is
-sys.path.append('/usr/share/qgis/python/plugins')
-#sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
+if sys.platform.startswith('linux'):
+    sys.path.append('/usr/share/qgis/python/plugins')
+elif sys.platform.startswith('win'):
+    sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
+
 from processing.core.Processing import Processing
 # importing "as processing" could be useful to make it slightly easier to take
 # the expressions from the processing history window in qgis
@@ -23,8 +26,11 @@ from processing.tools.system import *
 
 print "initializing"
 app = QgsApplication(sys.argv, True)
-QgsApplication.setPrefixPath('/usr', True)
-#QgsApplication.setPrefixPath(r'C:\OSGeo4W64\apps\qgis', True)
+if sys.platform.startswith('linux'):
+    QgsApplication.setPrefixPath('/usr', True)
+elif sys.platform.startswith('win'):
+    QgsApplication.setPrefixPath(r'C:\OSGeo4W64\apps\qgis', True)
+
 QgsApplication.initQgis();
 Processing.initialize()
 Processing.updateAlgsList()
