@@ -10,6 +10,7 @@ from PyQt4.QtCore import Qt, QFileInfo
 
 #Needed to make python aware of where Processing is
 sys.path.append('/usr/share/qgis/python/plugins')
+#sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
 from processing.core.Processing import Processing
 # importing "as processing" could be useful to make it slightly easier to take
 # the expressions from the processing history window in qgis
@@ -23,16 +24,18 @@ from processing.tools.system import *
 print "initializing"
 app = QgsApplication(sys.argv, True)
 QgsApplication.setPrefixPath('/usr', True)
+#QgsApplication.setPrefixPath(r'C:\OSGeo4W64\apps\qgis', True)
 QgsApplication.initQgis();
 Processing.initialize()
+Processing.updateAlgsList()
 
 # getExtent is used for Grass commands since they are picky
 # with how the extent is defined. Other commands can usually use None as
 # extent to use the entire file.
 def getExtent(extentRaster):
-    fileInfo = QFileInfo(inputraster)
+    fileInfo = QFileInfo(extentRaster)
     baseName = fileInfo.baseName()
-    rlayer = getObject(inputraster)
+    rlayer = getObject(extentRaster)
 
     extent = rlayer.extent()
     xmin = extent.xMinimum()
@@ -45,10 +48,10 @@ print "startar"
 # Set input/output directories
 # cwd = the directory where the script gets called.
 cwd = os.getcwd()
-procdir = cwd + '/LST-trad/hojd/'
-outdir = cwd + '/LST-trad/treecover2/'
+procdir = os.path.join(cwd, 'LST-trad', 'hojd')
+outdir = os.path.join(cwd, 'LST-trad','treecover2')
 # filter definition for grass:r.mfilter
-filterfile = cwd + "/LST-trad/qgis5x5filter_1or0_div1.txt"
+filterfile = os.path.join(cwd, 'LST-trad', 'qgis5x5filter_1or0_div1.txt')
 
 # filter to get all of the .tif files in the input directory
 inputfiles = []
@@ -65,7 +68,7 @@ for file in inputfiles:
     print "starting: ", basename
     inputraster = file
     outputraster = "COV_" + basename + ".tif"
-    outputraster = outdir + outputraster
+    outputraster = os.path.join(outdir, outputraster)
     extent = getExtent(inputraster)
 
     print "rascal 1"
