@@ -2,10 +2,9 @@ print "importing"
 # Not all of these are acutally used right now, the gui stuff probably could be
 # cleaned up
 from qgis.core import *
-from qgis.gui import *
-import os
-import sys
-from PyQt4.QtGui import *
+#from qgis.gui import *
+import os, sys
+#from PyQt4.QtGui import *
 from PyQt4.QtCore import Qt, QFileInfo
 
 #Needed to make python aware of where Processing is
@@ -14,15 +13,8 @@ if sys.platform.startswith('linux'):
 elif sys.platform.startswith('win'):
     sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
 
+import processing
 from processing.core.Processing import Processing
-# importing "as processing" could be useful to make it slightly easier to take
-# the expressions from the processing history window in qgis
-#import processing.tools.general as processing
-from processing.tools.dataobjects import *
-from processing.tools.general import *
-from processing.tools.vector import *
-from processing.tools.raster import *
-from processing.tools.system import *
 
 print "initializing"
 app = QgsApplication(sys.argv, True)
@@ -41,7 +33,7 @@ Processing.updateAlgsList()
 def getExtent(extentRaster):
     fileInfo = QFileInfo(extentRaster)
     baseName = fileInfo.baseName()
-    rlayer = getObject(extentRaster)
+    rlayer = processing.getObject(extentRaster)
 
     extent = rlayer.extent()
     xmin = extent.xMinimum()
@@ -78,15 +70,15 @@ for file in inputfiles:
     extent = getExtent(inputraster)
 
     print "rascal 1"
-    outputs_SAGARASTERCALCULATOR_1=runalg('saga:rastercalculator',
+    outputs_SAGARASTERCALCULATOR_1=processing.runalg('saga:rastercalculator',
                                           inputraster,[],saga_expression_1,True,1,None)
 
     print "mfilter"
-    outputs_GRASS7R_MFILTER_1=runalg('grass7:r.mfilter',
+    outputs_GRASS7R_MFILTER_1=processing.runalg('grass7:r.mfilter',
                                  outputs_SAGARASTERCALCULATOR_1['RESULT'],filterfile,1.0,False,extent,0.0,None)
 
     print "rascal 2"
-    outputs_SAGARASTERCALCULATOR_2=runalg('saga:rastercalculator',
+    outputs_SAGARASTERCALCULATOR_2=processing.runalg('saga:rastercalculator',
                                           outputs_GRASS7R_MFILTER_1['output'],[],saga_expression_2,True,1,outputraster)
 
     print "done with: ", basename, ", output as :", outputraster
