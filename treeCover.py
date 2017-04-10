@@ -89,16 +89,16 @@ for file in inputfiles:
 
 
 print "done, no more inputfiles"
-if len(outputfiles) > 0:
-    print "merging outputs"
+#if len(outputfiles) > 0:
+    #print "merging outputs"
     #tomerge = ";".join(outputfiles)
-    mergeOutput = os.path.join(outdir, "merge.tif")
-    sys.argv = ['-ot', 'Byte', '-o', mergeOutput] + outputfiles
+    #mergeOutput = os.path.join(outdir, "merge.tif")
+    #sys.argv = ['-ot', 'Byte', '-o', mergeOutput] + outputfiles
     #print tomerge
     #outputs_GDAL_MERGE = processing.runalg("gdalogr:merge", tomerge, False,
                                            #False, 0, mergeOutput)
-    gdal_merge.main()
-    print "done merging"
+    #gdal_merge.main()
+    #print "done merging"
 #QgsApplication.exitQgis();
 
 #processing.runalg("gdalogr:merge","/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/mergetest/subset;/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/treecover2/COV_THL_66_6_0025.tif",False,False,1,None)
