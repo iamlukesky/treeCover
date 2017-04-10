@@ -1,20 +1,18 @@
 print "importing"
-# Not all of these are acutally used right now, the gui stuff probably could be
-# cleaned up
 from qgis.core import *
-#from qgis.gui import *
 import os, sys
-#from PyQt4.QtGui import *
 from PyQt4.QtCore import Qt, QFileInfo
 
 #Needed to make python aware of where Processing is
 if sys.platform.startswith('linux'):
     sys.path.append('/usr/share/qgis/python/plugins')
+    sys.path.append('/usr/bin/') # for gdal_merge
 elif sys.platform.startswith('win'):
     sys.path.append('C:\\OSGeo4W64\\apps\\qgis\\python\\plugins')
 
 import processing
 from processing.core.Processing import Processing
+import gdal_merge
 
 print "initializing"
 app = QgsApplication(sys.argv, True)
@@ -61,6 +59,9 @@ for file in os.listdir(procdir):
 saga_expression_1 = 'ifelse(a > 50, 1, 0)'
 saga_expression_2 = 'a * 4'
 
+# for merging the results
+outputfiles = []
+
 for file in inputfiles:
     basename = QFileInfo(file).baseName()
     print "starting: ", basename
@@ -83,6 +84,21 @@ for file in inputfiles:
 
     print "done with: ", basename, ", output as :", outputraster
 
+    if len(inputfiles) > 1:
+        outputfiles.append(outputraster)
+
+
 print "done, no more inputfiles"
+if len(outputfiles) > 0:
+    print "merging outputs"
+    #tomerge = ";".join(outputfiles)
+    mergeOutput = os.path.join(outdir, "merge.tif")
+    sys.argv = ['-ot', 'Byte', '-o', mergeOutput] + outputfiles
+    #print tomerge
+    #outputs_GDAL_MERGE = processing.runalg("gdalogr:merge", tomerge, False,
+                                           #False, 0, mergeOutput)
+    gdal_merge.main()
+    print "done merging"
 #QgsApplication.exitQgis();
 
+#processing.runalg("gdalogr:merge","/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/mergetest/subset;/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/treecover2/COV_THL_66_6_0025.tif",False,False,1,None)
