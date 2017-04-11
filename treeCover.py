@@ -44,10 +44,10 @@ print "startar"
 # Set input/output directories
 # cwd = the directory where the script gets called.
 cwd = os.getcwd()
-procdir = os.path.join(cwd, 'LST-trad', 'hojd')
-outdir = os.path.join(cwd, 'LST-trad','treecover2')
+procdir = os.path.join(cwd, 'Input')
+outdir = os.path.join(cwd, 'Output')
 # filter definition for grass:r.mfilter
-filterfile = os.path.join(cwd, 'LST-trad', 'qgis5x5filter_1or0_div1.txt')
+filterfile = os.path.join(cwd, 'qgis5x5filter_1or0_div1.txt')
 
 # filter to get all of the .tif files in the input directory
 inputfiles = []
@@ -89,16 +89,16 @@ for file in inputfiles:
 
 
 print "done, no more inputfiles"
-#if len(outputfiles) > 0:
-    #print "merging outputs"
-    #tomerge = ";".join(outputfiles)
-    #mergeOutput = os.path.join(outdir, "merge.tif")
-    #sys.argv = ['-ot', 'Byte', '-o', mergeOutput] + outputfiles
-    #print tomerge
-    #outputs_GDAL_MERGE = processing.runalg("gdalogr:merge", tomerge, False,
-                                           #False, 0, mergeOutput)
-    #gdal_merge.main()
-    #print "done merging"
-#QgsApplication.exitQgis();
+if len(outputfiles) > 0:
+    print "merging outputs"
+    tomerge = ";".join(outputfiles)
+    mergeOutput = os.path.join(outdir, "merge.tif")
+    sys.argv = ['-ot', 'Byte', '-o', mergeOutput] + outputfiles
+    print tomerge
+    outputs_GDAL_MERGE = processing.runalg("gdalogr:merge", tomerge, False,
+                                           False, 0, mergeOutput)
+    gdal_merge.main()
+    print "done merging"
+QgsApplication.exitQgis();
 
-#processing.runalg("gdalogr:merge","/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/mergetest/subset;/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/treecover2/COV_THL_66_6_0025.tif",False,False,1,None)
+processing.runalg("gdalogr:merge","/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/mergetest/subset;/home/johnnie/GiB/Projekt/qgisHeadless/LST-trad/treecover2/COV_THL_66_6_0025.tif",False,False,1,None)
